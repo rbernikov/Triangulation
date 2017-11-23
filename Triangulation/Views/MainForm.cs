@@ -8,6 +8,7 @@ using Triangulation.Controllers;
 using Triangulation.Controls.Layers;
 using Triangulation.Geometry;
 using Triangulation.MapReduce;
+using Triangulation.Tree;
 using Triangulation.Zones;
 
 namespace Triangulation.Views
@@ -35,18 +36,20 @@ namespace Triangulation.Views
                 action();
         }
 
-        public void OnGraphLoaded(List<Vertex> vertices)
+        public void OnGraphLoaded(Node root, List<Vertex> vertices)
         {
-            Action<List<Vertex>> action = v =>
+            Action<Node, List<Vertex>> action = (x, y) =>
             {
-                var layer = new GraphLayer(v) { Name = "graph" };
+                var layer = new GraphLayer(y) { Name = "graph" };
                 map1.Layers.Add(layer);
+
+                BuildTree(x);
             };
 
             if (InvokeRequired)
-                Invoke(action, vertices);
+                Invoke(action, root, vertices);
             else
-                action(vertices);
+                action(root, vertices);
         }
 
         public void OnWatershedExtracted(List<Edge> edges)
@@ -57,7 +60,7 @@ namespace Triangulation.Views
 
                 if (map1.Layers["zones"] != null) return;
 
-                var layer = new WatershedLayer(edges) { Name = "zones" };
+                var layer = new WatershedLayer(e) { Name = "zones" };
                 map1.Layers.Add(layer);
             };
 
@@ -111,7 +114,11 @@ namespace Triangulation.Views
 
         public void OnShowProgress(bool show)
         {
-            Action action = () => statusProgress.Visible = show;
+            Action action = () =>
+            {
+                statusLoad.Visible = show;
+                statusProgress.Visible = show;
+            };
 
             if (InvokeRequired)
                 Invoke(action);
@@ -174,9 +181,54 @@ namespace Triangulation.Views
             layer.Selected = (int)listBox1.SelectedItem;
         }
 
+        private void OnNodeSelect(object sender, TreeViewEventArgs e)
+        {
+            var node = (Node)e.Node.Tag;
+
+            if (node == null) return;
+
+            var layer = (GraphLayer)map1.Layers["graph"];
+            if (layer == null) return;
+
+            layer.Selected = node.Vertices;
+            statusLabel.Text = @"Код русла:" + BuildLabel(node);
+        }
+
         private void OnExit(object sender, EventArgs e)
         {
             Close();
+        }
+
+        #endregion
+
+        #region Private methods
+
+        private void BuildTree(Node root)
+        {
+            var item = new TreeNode("Русло " + root.Id) { Tag = root };
+            foreach (var child in root.Children)
+            {
+                BuildTree(child, item);
+            }
+
+            treeView1.Nodes.Add(item);
+        }
+
+        private void BuildTree(Node root, TreeNode node)
+        {
+            var item = new TreeNode("Русло " + root.Id) { Tag = root };
+            foreach (var child in root.Children)
+            {
+                BuildTree(child, item);
+            }
+            node.Nodes.Add(item);
+        }
+
+        private string BuildLabel(Node node)
+        {
+            if (node == null) return string.Empty;
+
+            return BuildLabel(node.Parent) + " " + node.Id;
         }
 
         #endregion

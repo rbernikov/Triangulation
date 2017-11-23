@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
 using Triangulation.Geometry;
+using Triangulation.Tree;
 using Triangulation.Zones;
 
 namespace Triangulation.Views
@@ -8,7 +9,7 @@ namespace Triangulation.Views
     public interface IMainView
     {
         void OnUpdateView();
-        void OnGraphLoaded(List<Vertex> vertices);
+        void OnGraphLoaded(Node root, List<Vertex> vertices);
         void OnWatershedExtracted(List<Edge> edges);
         void OnBoundaryExtracted(Dictionary<int, ZoneInfo> zones);
         void OnZoneUnioned(int first, int second, ZoneInfo newZone);

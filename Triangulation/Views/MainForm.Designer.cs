@@ -45,6 +45,10 @@
             this.label1 = new System.Windows.Forms.Label();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.statusProgress = new System.Windows.Forms.ToolStripProgressBar();
+            this.treeView1 = new System.Windows.Forms.TreeView();
+            this.label2 = new System.Windows.Forms.Label();
+            this.statusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.statusLoad = new System.Windows.Forms.ToolStripStatusLabel();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -56,7 +60,7 @@
             this.processingItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
-            this.menuStrip1.Size = new System.Drawing.Size(896, 24);
+            this.menuStrip1.Size = new System.Drawing.Size(956, 24);
             this.menuStrip1.TabIndex = 0;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -156,16 +160,16 @@
             // 
             this.listBox1.FormattingEnabled = true;
             this.listBox1.ItemHeight = 17;
-            this.listBox1.Location = new System.Drawing.Point(718, 44);
+            this.listBox1.Location = new System.Drawing.Point(718, 295);
             this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(166, 157);
+            this.listBox1.Size = new System.Drawing.Size(226, 225);
             this.listBox1.TabIndex = 2;
             this.listBox1.SelectedIndexChanged += new System.EventHandler(this.OnZoneSelected);
             // 
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(715, 24);
+            this.label1.Location = new System.Drawing.Point(715, 275);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(84, 17);
             this.label1.TabIndex = 3;
@@ -174,10 +178,12 @@
             // statusStrip1
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.statusProgress});
+            this.statusLoad,
+            this.statusProgress,
+            this.statusLabel});
             this.statusStrip1.Location = new System.Drawing.Point(0, 530);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(896, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(956, 22);
             this.statusStrip1.TabIndex = 4;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -191,11 +197,41 @@
             this.statusProgress.ToolTipText = "Загрузка";
             this.statusProgress.Visible = false;
             // 
+            // treeView1
+            // 
+            this.treeView1.Location = new System.Drawing.Point(718, 44);
+            this.treeView1.Name = "treeView1";
+            this.treeView1.Size = new System.Drawing.Size(226, 228);
+            this.treeView1.TabIndex = 5;
+            this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.OnNodeSelect);
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(715, 24);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(95, 17);
+            this.label2.TabIndex = 6;
+            this.label2.Text = "Дерево русел:";
+            // 
+            // statusLabel
+            // 
+            this.statusLabel.Name = "statusLabel";
+            this.statusLabel.Size = new System.Drawing.Size(0, 17);
+            // 
+            // statusLoad
+            // 
+            this.statusLoad.Name = "statusLoad";
+            this.statusLoad.Size = new System.Drawing.Size(55, 17);
+            this.statusLoad.Text = "Загрузка";
+            // 
             // MainForm
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.BackColor = System.Drawing.Color.White;
-            this.ClientSize = new System.Drawing.Size(896, 552);
+            this.ClientSize = new System.Drawing.Size(956, 552);
+            this.Controls.Add(this.label2);
+            this.Controls.Add(this.treeView1);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.listBox1);
@@ -234,6 +270,10 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripProgressBar statusProgress;
+        private System.Windows.Forms.TreeView treeView1;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.ToolStripStatusLabel statusLabel;
+        private System.Windows.Forms.ToolStripStatusLabel statusLoad;
     }
 }
 

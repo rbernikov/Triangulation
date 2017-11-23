@@ -5,6 +5,7 @@ using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using Triangulation.Geometry;
+using Triangulation.Tree;
 using Triangulation.Zones;
 using Excel = Microsoft.Office.Interop.Excel;
 
@@ -22,17 +23,18 @@ namespace Triangulation.Loader
             _app.ScreenUpdating = false;
         }
 
-        public void Load(string filename, List<Vertex> vertices, Dictionary<int, ZoneInfo> zones)
+        public Node Load(string filename, Dictionary<int, ZoneInfo> zones)
         {
             Preconditions.CheckNotNull(zones, "zones");
-            Preconditions.CheckNotNull(vertices, "vertices");
             Preconditions.CheckNotNullOrEmpty(filename, "filename");
 
             var id = 1; // id ерика
             var index = 2; // страница, с которой парсим ерики
             var offset = 14;
             var counter = 0;
-            var mod = 3; // берем только каждую n-ую точку
+            var mod = 4; // берем только каждую n-ую точку
+
+            var root = new Node("0");
 
             _book = _app.Workbooks.Open(filename, ReadOnly: true);
 
@@ -53,10 +55,29 @@ namespace Triangulation.Loader
                     var value = matrix[rect.Y, rect.X]?.ToString();
                     if (string.IsNullOrWhiteSpace(value)) break;
 
+                    value = matrix[rect.Y, rect.X + 4]?.ToString();
+                    var node = root;
+                    for (int i = 5; i < 9; i++)
+                    {
+                        if (node[value] == null)
+                        {
+                            node = node.AddChild(value);
+                            node.Label = id++;
+                            break;
+                        }
+
+                        node = node[value];
+                        value = matrix[rect.Y, rect.X + i]?.ToString();
+
+                        if (value == "0") break;
+                    }
+
                     var y = matrix[rect.Y, rect.X].ToString();
                     var x = matrix[rect.Y, rect.X + 1].ToString();
+                    var label = node.Label;
 
-                    zones.Add(id, new ZoneInfo(id, 0, GetVertex(x, y, id)));
+                    if (!zones.ContainsKey(label))
+                        zones.Add(label, new ZoneInfo(label, 0, GetVertex(x, y, label)));
 
                     for (int i = 0; i < rect.Height; i++)
                     {
@@ -74,10 +95,9 @@ namespace Triangulation.Loader
                         y = matrix[rect.Y + i, rect.X].ToString();
                         x = matrix[rect.Y + i, rect.X + 1].ToString();
 
-                        vertices.Add(GetVertex(x, y, id));
+                        node.AddVertex(GetVertex(x, y, label));
                     }
 
-                    id++;
                     counter = 0;
                     rect.Offset(offset, 0);
                 }
@@ -86,6 +106,8 @@ namespace Triangulation.Loader
             }
 
             Dispose();
+
+            return root;
         }
 
         private Vertex GetVertex(string x, string y, int id)

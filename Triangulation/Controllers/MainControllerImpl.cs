@@ -11,6 +11,7 @@ using Triangulation.Views;
 using Triangulation.Grd;
 using Triangulation.Loader;
 using Triangulation.MapReduce;
+using Triangulation.Tree;
 using Triangulation.Union;
 using Triangulation.Utils;
 using Triangulation.Zones;
@@ -22,10 +23,12 @@ namespace Triangulation.Controllers
         private GrdFile _grd;
         private GrdFile _map;
 
+        private Node _root;
+
         private readonly IMainView _view;
         private readonly Delaunay _delaunay;
         private readonly Watershed _watershed;
-
+        
         private readonly List<Vertex> _vertices;
 
         private readonly Dictionary<int, ZoneInfo> _zones;
@@ -36,6 +39,7 @@ namespace Triangulation.Controllers
             _delaunay = new Delaunay();
             _watershed = new Watershed(_delaunay);
 
+            _root = new Node("0");
             _vertices = new List<Vertex>();
             _zones = new Dictionary<int, ZoneInfo>();
         }
@@ -55,6 +59,7 @@ namespace Triangulation.Controllers
 
             _view.OnShowProgress(true);
 
+            _root.Clear();
             _zones.Clear();
             _vertices.Clear();
 
@@ -67,10 +72,12 @@ namespace Triangulation.Controllers
 
             var thread = new Thread(() =>
             {
-                loader.Load(fileName, _vertices, _zones);
+                _root = loader.Load(fileName, _zones);
+                _root.Traverse(AddVertices);
+
                 CreateSquare();
 
-                _view.OnGraphLoaded(_vertices);
+                _view.OnGraphLoaded(_root, _vertices);
                 _view.OnUpdateView();
                 _view.OnShowProgress(false);
             })
@@ -168,7 +175,7 @@ namespace Triangulation.Controllers
             var minY = (int)_vertices.Min(x => x.Y) - 10;
             var maxX = (int)_vertices.Max(x => x.X) + 10;
             var maxY = (int)_vertices.Max(x => x.Y) + 10;
-
+            
             for (int i = minX; i < maxX; i += 10)
             {
                 _vertices.Add(new Vertex(i, minY));
@@ -180,6 +187,11 @@ namespace Triangulation.Controllers
                 _vertices.Add(new Vertex(minX, i));
                 _vertices.Add(new Vertex(maxX, i));
             }
+        }
+
+        private void AddVertices(Node root)
+        {
+            _vertices.AddRange(root.Vertices);
         }
 
         private void FillZones(IEnumerable<Edge> edges)

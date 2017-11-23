@@ -5,16 +5,19 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Triangulation.Geometry;
 using Triangulation.Json;
+using Triangulation.Tree;
 using Triangulation.Zones;
 
 namespace Triangulation.Loader
 {
-    public class JsonLoader:ILoader
+    public class JsonLoader : ILoader
     {
-        public void Load(string filename, List<Vertex> vertices, Dictionary<int, ZoneInfo> zones)
+        public Node Load(string filename, Dictionary<int, ZoneInfo> zones)
         {
             var json = JObject.Parse(File.ReadAllText(filename));
             var list = json["nodes"].Children().ToList();
+
+            var root = new Node("0");
 
             foreach (var token in list)
             {
@@ -34,9 +37,11 @@ namespace Triangulation.Loader
 
                     var vertex = new Vertex(x, y, node.Id);
 
-                    vertices.Add(vertex);
+                    root.AddVertex(vertex);
                 }
             }
+
+            return root;
         }
     }
 }

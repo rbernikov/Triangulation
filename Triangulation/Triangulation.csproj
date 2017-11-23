@@ -84,7 +84,7 @@
     <Compile Include="Loader\LoaderFactory.cs" />
     <Compile Include="MapReduce\CommonBoundary.cs" />
     <Compile Include="MapReduce\CommonTriangles.cs" />
-    <Compile Include="Tree\TreeNode.cs" />
+    <Compile Include="Tree\Node.cs" />
     <Compile Include="Utils\EnumerableEx.cs" />
     <Compile Include="Views\UnionForm.cs">
       <SubType>Form</SubType>
