@@ -1,19 +1,13 @@
 ﻿using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
 using System.Linq;
 using System.Threading;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Triangulation.Geometry;
-using Triangulation.Json;
 using Triangulation.Views;
 using Triangulation.Grd;
 using Triangulation.Loader;
 using Triangulation.MapReduce;
 using Triangulation.Tree;
 using Triangulation.Union;
-using Triangulation.Utils;
 using Triangulation.Zones;
 
 namespace Triangulation.Controllers
@@ -31,8 +25,6 @@ namespace Triangulation.Controllers
 
         private readonly List<Vertex> _vertices;
 
-        private readonly Dictionary<int, ZoneInfo> _zones;
-
         public MainControllerImpl(IMainView view)
         {
             _view = view;
@@ -40,7 +32,6 @@ namespace Triangulation.Controllers
             _watershed = new Watershed(_delaunay);
 
             _root = new Node("0");
-            _zones = new Dictionary<int, ZoneInfo>();
             _vertices = new List<Vertex>();
         }
 
@@ -60,7 +51,6 @@ namespace Triangulation.Controllers
             _view.OnShowProgress(true);
 
             _root.Clear();
-            _zones.Clear();
             _vertices.Clear();
 
             var loader = LoaderFactory.Create(LoaderFactory.Excel);
@@ -72,7 +62,7 @@ namespace Triangulation.Controllers
 
             var thread = new Thread(() =>
             {
-                _root = loader.Load(fileName, _zones);
+                _root = loader.Load(fileName);
                 _root.Traverse(AddVertices);
 
                 _view.OnGraphLoaded(_root, _vertices);
@@ -119,9 +109,9 @@ namespace Triangulation.Controllers
         {
             if (_grd == null) return;
 
-            Zone.ExtractBoundary(_grd, _zones);
+            Zone.ExtractBoundary(_grd, _root);
 
-            _view.OnBoundaryExtracted(_zones);
+            _view.OnBoundaryExtracted(_root);
         }
 
         public void OnZoneUnion(int method, float percent)
@@ -146,7 +136,7 @@ namespace Triangulation.Controllers
             }
 
             var mapReduce = new CommonBoundary();
-            var execute = mapReduce.Execute(_zones.Values);
+            var execute = mapReduce.Execute(_root);
 
             var dictionary = union.Union(_map, execute, percent);
             foreach (var zone in dictionary.OrderBy(x => x.Key, new Comparer()))
@@ -204,10 +194,14 @@ namespace Triangulation.Controllers
                 GrdGraphics.DrawLine(_grd, (int)edge.V0.X, (int)edge.V0.Y, (int)edge.V1.X, (int)edge.V1.Y);
             }
 
-            foreach (var info in _zones.Values)
+            _root.Traverse(node =>
             {
-                FillZone(_grd.Data, info.Point, info.Id);
-            }
+                if (node.Vertices.Count == 0) return;
+
+                var vertex = node.Vertices[0];
+
+                FillZone(_grd.Data, vertex, node.Label);
+            });
         }
 
         private void FillZone(float[,] grd, Vertex vertex, int zone)

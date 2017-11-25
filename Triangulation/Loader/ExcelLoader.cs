@@ -23,9 +23,8 @@ namespace Triangulation.Loader
             _app.ScreenUpdating = false;
         }
 
-        public Node Load(string filename, Dictionary<int, ZoneInfo> zones)
+        public Node Load(string filename)
         {
-            Preconditions.CheckNotNull(zones, "zones");
             Preconditions.CheckNotNullOrEmpty(filename, "filename");
 
             var id = 1; // id ерика
@@ -72,13 +71,7 @@ namespace Triangulation.Loader
                         if (value == "0") break;
                     }
 
-                    var y = matrix[rect.Y, rect.X].ToString();
-                    var x = matrix[rect.Y, rect.X + 1].ToString();
                     var label = node.Label;
-
-                    if (!zones.ContainsKey(label))
-                        zones.Add(label, new ZoneInfo(label, 0, GetVertex(x, y, label)));
-
                     for (int i = 0; i < rect.Height; i++)
                     {
                         if (matrix.GetLength(0) <= rect.Y + i) break;
@@ -92,8 +85,8 @@ namespace Triangulation.Loader
                         value = matrix[rect.Y + i, rect.X + 4] + matrix[rect.Y + i, rect.X + 5].ToString();
                         if (value != "10" && counter++ % mod != 0) continue;
 
-                        y = matrix[rect.Y + i, rect.X].ToString();
-                        x = matrix[rect.Y + i, rect.X + 1].ToString();
+                        var y = matrix[rect.Y + i, rect.X].ToString();
+                        var x = matrix[rect.Y + i, rect.X + 1].ToString();
 
                         node.AddVertex(GetVertex(x, y, label));
                     }

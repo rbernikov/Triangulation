@@ -1,18 +1,16 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Triangulation.Geometry;
 using Triangulation.Json;
 using Triangulation.Tree;
-using Triangulation.Zones;
 
 namespace Triangulation.Loader
 {
     public class JsonLoader : ILoader
     {
-        public Node Load(string filename, Dictionary<int, ZoneInfo> zones)
+        public Node Load(string filename)
         {
             var json = JObject.Parse(File.ReadAllText(filename));
             var list = json["nodes"].Children().ToList();
@@ -25,10 +23,6 @@ namespace Triangulation.Loader
 
                 var count = node.X.Count;
                 if (count != node.Y.Count) continue;
-
-                var point = new Vertex(node.X[1], node.Y[1], node.Id);
-                var info = new ZoneInfo(node.Id, node.Group, point);
-                zones.Add(node.Id, info);
 
                 for (int i = 0; i < count; i++)
                 {

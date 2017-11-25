@@ -115,7 +115,6 @@
     <Compile Include="Zones\Watershed.cs" />
     <Compile Include="Union\WetUnion.cs" />
     <Compile Include="Zones\Zone.cs" />
-    <Compile Include="Zones\ZoneInfo.cs" />
     <EmbeddedResource Include="Views\MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>

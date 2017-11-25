@@ -42,7 +42,7 @@
             this.extractBoundaryItem = new System.Windows.Forms.ToolStripMenuItem();
             this.unionZoneItem = new System.Windows.Forms.ToolStripMenuItem();
             this.map1 = new Triangulation.Controls.Map();
-            this.listBox1 = new System.Windows.Forms.ListBox();
+            this.listBox = new System.Windows.Forms.ListBox();
             this.label1 = new System.Windows.Forms.Label();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.statusLoad = new System.Windows.Forms.ToolStripStatusLabel();
@@ -161,15 +161,15 @@
             this.map1.TabIndex = 1;
             this.map1.Text = "map1";
             // 
-            // listBox1
+            // listBox
             // 
-            this.listBox1.FormattingEnabled = true;
-            this.listBox1.ItemHeight = 17;
-            this.listBox1.Location = new System.Drawing.Point(718, 295);
-            this.listBox1.Name = "listBox1";
-            this.listBox1.Size = new System.Drawing.Size(226, 225);
-            this.listBox1.TabIndex = 2;
-            this.listBox1.SelectedIndexChanged += new System.EventHandler(this.OnZoneSelected);
+            this.listBox.FormattingEnabled = true;
+            this.listBox.ItemHeight = 17;
+            this.listBox.Location = new System.Drawing.Point(718, 295);
+            this.listBox.Name = "listBox";
+            this.listBox.Size = new System.Drawing.Size(226, 225);
+            this.listBox.TabIndex = 2;
+            this.listBox.SelectedIndexChanged += new System.EventHandler(this.OnZoneSelected);
             // 
             // label1
             // 
@@ -262,7 +262,7 @@
             this.Controls.Add(this.treeView);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.listBox1);
+            this.Controls.Add(this.listBox);
             this.Controls.Add(this.map1);
             this.Controls.Add(this.menuStrip1);
             this.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
@@ -294,7 +294,7 @@
         private System.Windows.Forms.ToolStripMenuItem openMapItem;
         private Controls.Map map1;
         private System.Windows.Forms.ToolStripMenuItem extractBoundaryItem;
-        private System.Windows.Forms.ListBox listBox1;
+        private System.Windows.Forms.ListBox listBox;
         private System.Windows.Forms.ToolStripMenuItem unionZoneItem;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.StatusStrip statusStrip1;

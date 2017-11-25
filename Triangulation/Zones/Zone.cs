@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Linq;
 using Triangulation.Grd;
+using Triangulation.Tree;
 
 namespace Triangulation.Zones
 {
@@ -11,26 +12,35 @@ namespace Triangulation.Zones
         /// Нахождение границ всех зон
         /// </summary>
         /// <param name="grd">Файл grd с зонами</param>
-        /// <param name="infos">Коллекция с номером зоны и информацией</param>
-        public static void ExtractBoundary(GrdFile grd, Dictionary<int, ZoneInfo> infos)
+        /// <param name="root">Дерево русел</param>
+        public static void ExtractBoundary(GrdFile grd, Node root)
         {
             Preconditions.CheckNotNull(grd, "grd");
-            Preconditions.CheckNotNull(infos, "infos");
+            Preconditions.CheckNotNull(root, "root");
 
-            var zones = new List<int>();
+            var zones = new Dictionary<int, List<Point>>();
             for (int j = 0; j < grd.Column; j++)
             {
                 for (int i = 0; i < grd.Row; i++)
                 {
                     var zone = (int)grd.Data[i, j];
 
-                    if (zone > 0 && !zones.Contains(zone))
+                    if (zone > 0 && !zones.ContainsKey(zone))
                     {
-                        zones.Add(zone);
-                        infos[zone].Boundary = ExtractBoundary(grd, new Point(i, j - 1));
+                        var boundary = ExtractBoundary(grd, new Point(i, j - 1));
+                        zones.Add(zone, boundary);
                     }
                 }
             }
+
+            root.Traverse(node =>
+            {
+                var label = node.Label;
+
+                if (!zones.ContainsKey(label)) return;
+
+                node.Boundary = zones[label];
+            });
         }
 
         /// <summary>
@@ -39,7 +49,7 @@ namespace Triangulation.Zones
         /// <param name="first">Первая зона</param>
         /// <param name="second">Вторая зона</param>
         /// <returns>Список точек общей границы</returns>
-        public static IList<Point> CommonBoundary(ZoneInfo first, ZoneInfo second)
+        public static IList<Point> CommonBoundary(Node first, Node second)
         {
             Preconditions.CheckNotNull(first, "first");
             Preconditions.CheckNotNull(second, "second");
@@ -53,7 +63,7 @@ namespace Triangulation.Zones
         /// <param name="grd">Файл grd с зонами</param>
         /// <param name="first">Первая зона</param>
         /// <param name="second">Вторая зона</param>
-        public static void Union(GrdFile grd, ZoneInfo first, ZoneInfo second)
+        public static void Union(GrdFile grd, Node first, Node second)
         {
             Preconditions.CheckNotNull(grd, "grd");
             Preconditions.CheckNotNull(first, "first");
@@ -64,13 +74,13 @@ namespace Triangulation.Zones
 
             foreach (var point in boundary)
             {
-                grd.Data[point.X, point.Y] = second.Id;
+                grd.Data[point.X, point.Y] = second.Label;
             }
 
-            FillZone(grd.Data, boundary[0], second.Id, first.Id);
+            FillZone(grd.Data, boundary[0], second.Label, first.Label);
         }
 
-        private static IList<Point> ExtractBoundary(GrdFile grd, Point start)
+        private static List<Point> ExtractBoundary(GrdFile grd, Point start)
         {
             int[] dx = { 1, 1, 0, -1, -1, -1, 0, 1 };
             int[] dy = { 0, -1, -1, -1, 0, 1, 1, 1 };
@@ -100,7 +110,7 @@ namespace Triangulation.Zones
             } while (!(contour.Last() == contour.First()));
 
             contour.RemoveAt(0);
-            return contour;
+            return contour.ToList();
         }
 
         public static void FillZone(float[,] grd, Point start, int from, int to)

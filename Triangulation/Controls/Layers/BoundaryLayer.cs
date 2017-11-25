@@ -1,23 +1,23 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
+using Triangulation.Tree;
 using Triangulation.Zones;
 
 namespace Triangulation.Controls.Layers
 {
     public class BoundaryLayer : BaseLayer
     {
-        private Dictionary<int, ZoneInfo> _zones;
+        private Node _root;
         private int _selected;
 
-        public Dictionary<int, ZoneInfo> Zones
+        public Node Root
         {
-            get => _zones;
+            get => _root;
             set
             {
                 if (value == null) Enabled = false;
-                if (value == _zones) return;
 
-                _zones = value;
+                _root = value;
                 Parent.Invalidate();
             }
         }
@@ -38,21 +38,21 @@ namespace Triangulation.Controls.Layers
 
         public override void Render(Graphics graphics)
         {
-            if (_zones == null || _zones.Count == 0) return;
+            if (_root == null) return;
 
-            foreach (var zone in _zones)
+            _root.Traverse(node =>
             {
-                InternalRender(graphics, Brushes.Green, zone.Value.Boundary);
-            }
+                InternalRender(graphics, Brushes.Green, node.Boundary);
 
-            if (_selected > 0) InternalRender(graphics, Brushes.Red, _zones[_selected].Boundary);
+                if (_selected == node.Label) InternalRender(graphics, Brushes.Red, node.Boundary);
+            });
         }
 
-        private void InternalRender(Graphics graphics, Brush brush, IEnumerable<Point> zone)
+        private void InternalRender(Graphics graphics, Brush brush, IEnumerable<Point> boundary)
         {
-            if (zone == null) return;
+            if (boundary == null) return;
 
-            foreach (var point in zone)
+            foreach (var point in boundary)
             {
                 var rect = new RectangleF(point.X - 0.5f, point.Y - 0.5f, 1, 1);
 

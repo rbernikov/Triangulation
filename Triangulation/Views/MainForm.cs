@@ -58,6 +58,9 @@ namespace Triangulation.Views
             {
                 saveZonesItem.Enabled = true;
 
+                var boundary = map1.Layers["boundary"];
+                if (boundary != null) boundary.Enabled = false;
+
                 WatershedLayer layer;
                 if ((layer = (WatershedLayer)map1.Layers["zones"]) == null)
                 {
@@ -66,6 +69,9 @@ namespace Triangulation.Views
                 }
 
                 layer.Edges = e;
+                layer.Enabled = true;
+
+                listBox.Items.Clear();
             };
 
             if (InvokeRequired)
@@ -74,11 +80,12 @@ namespace Triangulation.Views
                 action(edges);
         }
 
-        public void OnBoundaryExtracted(Dictionary<int, ZoneInfo> zones)
+        public void OnBoundaryExtracted(Node root)
         {
-            Action<Dictionary<int, ZoneInfo>> action = z =>
+            Action<Node> action = node =>
             {
-                map1.Layers["zones"].Enabled = false;
+                var zones = map1.Layers["zones"];
+                if (zones != null) zones.Enabled = false;
 
                 BoundaryLayer layer;
                 if ((layer = (BoundaryLayer)map1.Layers["boundary"]) == null)
@@ -87,23 +94,23 @@ namespace Triangulation.Views
                     map1.Layers.Add(layer);
                 }
 
-                layer.Zones = z;
-                listBox1.Items.Clear();
-                foreach (var key in z.Keys.OrderBy(i => i))
+                layer.Root = node;
+                layer.Enabled = true;
+
+                var list = new List<int>();
+                node.Traverse(x => list.Add(x.Label));
+
+                listBox.Items.Clear();
+                foreach (var i in list.OrderBy(i => i))
                 {
-                    listBox1.Items.Add(key);
+                    listBox.Items.Add(i);
                 }
             };
 
             if (InvokeRequired)
-                Invoke(action, zones);
+                Invoke(action, root);
             else
-                action(zones);
-        }
-
-        public void OnZoneUnioned(int first, int second, ZoneInfo newZone)
-        {
-
+                action(root);
         }
 
         public void OnShowError(string message)
@@ -179,10 +186,10 @@ namespace Triangulation.Views
 
         private void OnZoneSelected(object sender, EventArgs e)
         {
-            if (listBox1.SelectedIndex < 0) return;
+            if (listBox.SelectedIndex < 0) return;
 
             var layer = (BoundaryLayer)map1.Layers["boundary"];
-            layer.Selected = (int)listBox1.SelectedItem;
+            layer.Selected = (int)listBox.SelectedItem;
         }
 
         private void OnNodeSelect(object sender, TreeViewEventArgs e)

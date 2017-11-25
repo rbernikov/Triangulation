@@ -11,8 +11,7 @@ namespace Triangulation.Views
         void OnUpdateView();
         void OnGraphLoaded(Node root, List<Vertex> vertices);
         void OnWatershedExtracted(List<Edge> edges);
-        void OnBoundaryExtracted(Dictionary<int, ZoneInfo> zones);
-        void OnZoneUnioned(int first, int second, ZoneInfo newZone);
+        void OnBoundaryExtracted(Node root);
 
         void OnShowError(string message);
         void OnShowProgress(bool show);
