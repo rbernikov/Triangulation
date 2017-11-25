@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openGraphItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -44,13 +45,17 @@
             this.listBox1 = new System.Windows.Forms.ListBox();
             this.label1 = new System.Windows.Forms.Label();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-            this.statusProgress = new System.Windows.Forms.ToolStripProgressBar();
-            this.treeView1 = new System.Windows.Forms.TreeView();
-            this.label2 = new System.Windows.Forms.Label();
-            this.statusLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.statusLoad = new System.Windows.Forms.ToolStripStatusLabel();
+            this.statusProgress = new System.Windows.Forms.ToolStripProgressBar();
+            this.statusLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.treeView = new System.Windows.Forms.TreeView();
+            this.label2 = new System.Windows.Forms.Label();
+            this.contextTreeMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.unionMenu = new System.Windows.Forms.ToolStripMenuItem();
+            this.selectAllMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.menuStrip1.SuspendLayout();
             this.statusStrip1.SuspendLayout();
+            this.contextTreeMenu.SuspendLayout();
             this.SuspendLayout();
             // 
             // menuStrip1
@@ -187,6 +192,12 @@
             this.statusStrip1.TabIndex = 4;
             this.statusStrip1.Text = "statusStrip1";
             // 
+            // statusLoad
+            // 
+            this.statusLoad.Name = "statusLoad";
+            this.statusLoad.Size = new System.Drawing.Size(55, 17);
+            this.statusLoad.Text = "Загрузка";
+            // 
             // statusProgress
             // 
             this.statusProgress.ForeColor = System.Drawing.Color.Lime;
@@ -197,13 +208,19 @@
             this.statusProgress.ToolTipText = "Загрузка";
             this.statusProgress.Visible = false;
             // 
-            // treeView1
+            // statusLabel
             // 
-            this.treeView1.Location = new System.Drawing.Point(718, 44);
-            this.treeView1.Name = "treeView1";
-            this.treeView1.Size = new System.Drawing.Size(226, 228);
-            this.treeView1.TabIndex = 5;
-            this.treeView1.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.OnNodeSelect);
+            this.statusLabel.Name = "statusLabel";
+            this.statusLabel.Size = new System.Drawing.Size(0, 17);
+            // 
+            // treeView
+            // 
+            this.treeView.Location = new System.Drawing.Point(718, 44);
+            this.treeView.Name = "treeView";
+            this.treeView.Size = new System.Drawing.Size(226, 228);
+            this.treeView.TabIndex = 5;
+            this.treeView.AfterSelect += new System.Windows.Forms.TreeViewEventHandler(this.OnNodeSelect);
+            this.treeView.NodeMouseClick += new System.Windows.Forms.TreeNodeMouseClickEventHandler(this.OnNodeClick);
             // 
             // label2
             // 
@@ -214,16 +231,27 @@
             this.label2.TabIndex = 6;
             this.label2.Text = "Дерево русел:";
             // 
-            // statusLabel
+            // contextTreeMenu
             // 
-            this.statusLabel.Name = "statusLabel";
-            this.statusLabel.Size = new System.Drawing.Size(0, 17);
+            this.contextTreeMenu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.unionMenu,
+            this.selectAllMenu});
+            this.contextTreeMenu.Name = "contextTreeMenu";
+            this.contextTreeMenu.Size = new System.Drawing.Size(149, 48);
             // 
-            // statusLoad
+            // unionMenu
             // 
-            this.statusLoad.Name = "statusLoad";
-            this.statusLoad.Size = new System.Drawing.Size(55, 17);
-            this.statusLoad.Text = "Загрузка";
+            this.unionMenu.Name = "unionMenu";
+            this.unionMenu.Size = new System.Drawing.Size(148, 22);
+            this.unionMenu.Text = "Объединить";
+            this.unionMenu.Click += new System.EventHandler(this.OnNodeUnion);
+            // 
+            // selectAllMenu
+            // 
+            this.selectAllMenu.Name = "selectAllMenu";
+            this.selectAllMenu.Size = new System.Drawing.Size(148, 22);
+            this.selectAllMenu.Text = "Выделить все";
+            this.selectAllMenu.Click += new System.EventHandler(this.OnNodeSelectAll);
             // 
             // MainForm
             // 
@@ -231,7 +259,7 @@
             this.BackColor = System.Drawing.Color.White;
             this.ClientSize = new System.Drawing.Size(956, 552);
             this.Controls.Add(this.label2);
-            this.Controls.Add(this.treeView1);
+            this.Controls.Add(this.treeView);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.listBox1);
@@ -246,6 +274,7 @@
             this.menuStrip1.PerformLayout();
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
+            this.contextTreeMenu.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -270,10 +299,13 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripProgressBar statusProgress;
-        private System.Windows.Forms.TreeView treeView1;
+        private System.Windows.Forms.TreeView treeView;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.ToolStripStatusLabel statusLabel;
         private System.Windows.Forms.ToolStripStatusLabel statusLoad;
+        private System.Windows.Forms.ContextMenuStrip contextTreeMenu;
+        private System.Windows.Forms.ToolStripMenuItem unionMenu;
+        private System.Windows.Forms.ToolStripMenuItem selectAllMenu;
     }
 }
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using Triangulation.Geometry;
 
@@ -20,14 +21,31 @@ namespace Triangulation.Tree
 
         public int Label { get; set; }
 
+        public int Depth
+        {
+            get
+            {
+                if (Parent == null) return 0;
+
+                return Parent.Depth + 1;
+            }
+        }
+
+        public bool HasChildren
+        {
+            get { return _children.Count > 0; }
+        }
+
         public Node Parent { get; private set; }
+
+        public List<Point> Boundary { get; set; }
 
         public IReadOnlyCollection<Node> Children
         {
             get { return _children.AsReadOnly(); }
         }
 
-        public List<Vertex> Vertices { get; }
+        public List<Vertex> Vertices { get; set; }
 
         public Node this[int index]
         {
@@ -61,6 +79,17 @@ namespace Triangulation.Tree
             return _children.Remove(item);
         }
 
+        public void ClearChildren()
+        {
+            foreach (var child in _children)
+            {
+                child.Vertices.Clear();
+                child.ClearChildren();
+            }
+
+            _children.Clear();
+        }
+
         public void AddVertex(Vertex item)
         {
             Preconditions.CheckNotNull(item, nameof(item));
@@ -77,12 +106,8 @@ namespace Triangulation.Tree
 
         public void Clear()
         {
+            ClearChildren();
             Vertices.Clear();
-            foreach (var child in _children)
-            {
-                child.Clear();
-            }
-            _children.Clear();
         }
     }
 }

@@ -6,13 +6,19 @@ namespace Triangulation.Controls.Layers
 {
     public class WatershedLayer : BaseLayer
     {
-        private readonly IList<Edge> _edges;
+        private List<Edge> _edges;
 
-        public WatershedLayer(IList<Edge> edges)
+        public List<Edge> Edges
         {
-            _edges = edges;
+            get { return _edges; }
+            set
+            {
+                _edges = value;
+
+                Parent.Invalidate();
+            }
         }
-        
+
         public override void Render(Graphics graphics)
         {
             if (_edges == null || _edges.Count == 0) return;

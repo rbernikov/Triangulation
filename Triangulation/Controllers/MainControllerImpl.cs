@@ -28,7 +28,7 @@ namespace Triangulation.Controllers
         private readonly IMainView _view;
         private readonly Delaunay _delaunay;
         private readonly Watershed _watershed;
-        
+
         private readonly List<Vertex> _vertices;
 
         private readonly Dictionary<int, ZoneInfo> _zones;
@@ -40,8 +40,8 @@ namespace Triangulation.Controllers
             _watershed = new Watershed(_delaunay);
 
             _root = new Node("0");
-            _vertices = new List<Vertex>();
             _zones = new Dictionary<int, ZoneInfo>();
+            _vertices = new List<Vertex>();
         }
 
         #region IController implements
@@ -75,8 +75,6 @@ namespace Triangulation.Controllers
                 _root = loader.Load(fileName, _zones);
                 _root.Traverse(AddVertices);
 
-                CreateSquare();
-
                 _view.OnGraphLoaded(_root, _vertices);
                 _view.OnUpdateView();
                 _view.OnShowProgress(false);
@@ -97,12 +95,15 @@ namespace Triangulation.Controllers
 
         public void OnWatershedExtract()
         {
-            if (_vertices.Count == 0) return;
-
             _view.OnShowProgress(true);
 
             var thread = new Thread(() =>
             {
+                _vertices.Clear();
+
+                _root.Traverse(AddVertices);
+                CreateSquare();
+
                 _watershed.Extract(_vertices);
                 FillZones(_watershed.Edges);
 
@@ -137,9 +138,6 @@ namespace Triangulation.Controllers
                 return;
             }
 
-            var mapReduce = new CommonBoundary();
-            var execute = mapReduce.Execute(_zones.Values);
-
             var union = UnionFactory.Create(method);
             if (!Preconditions.CheckNotNull(union))
             {
@@ -147,17 +145,20 @@ namespace Triangulation.Controllers
                 return;
             }
 
-            var dictionary = union.Union(_map, execute, percent);
-            foreach (var zone in dictionary.OrderBy(pair => pair.Key, new Comparer()))
-            {
-                foreach (var point in zone.Value)
-                {
-                    _grd.Data[point.X, point.Y] = zone.Key.Value;
-                }
+            var mapReduce = new CommonBoundary();
+            var execute = mapReduce.Execute(_zones.Values);
 
+            var dictionary = union.Union(_map, execute, percent);
+            foreach (var zone in dictionary.OrderBy(x => x.Key, new Comparer()))
+            {
                 var first = zone.Key.Key;
                 var second = zone.Key.Value;
                 var points = zone.Value;
+
+                foreach (var point in zone.Value)
+                {
+                    _grd.Data[point.X, point.Y] = second;
+                }
 
                 if (points.Count < 2) continue;
 
@@ -175,7 +176,7 @@ namespace Triangulation.Controllers
             var minY = (int)_vertices.Min(x => x.Y) - 10;
             var maxX = (int)_vertices.Max(x => x.X) + 10;
             var maxY = (int)_vertices.Max(x => x.Y) + 10;
-            
+
             for (int i = minX; i < maxX; i += 10)
             {
                 _vertices.Add(new Vertex(i, minY));
@@ -248,7 +249,8 @@ namespace Triangulation.Controllers
         {
             public int Compare(KeyValuePair<int, int> x, KeyValuePair<int, int> y)
             {
-                return x.Key - y.Key + x.Value - y.Value;
+                var key = x.Key - y.Key;
+                return key != 0 ? key : x.Value - y.Value;
             }
         }
 

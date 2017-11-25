@@ -58,10 +58,14 @@ namespace Triangulation.Views
             {
                 saveZonesItem.Enabled = true;
 
-                if (map1.Layers["zones"] != null) return;
+                WatershedLayer layer;
+                if ((layer = (WatershedLayer)map1.Layers["zones"]) == null)
+                {
+                    layer = new WatershedLayer { Name = "zones" };
+                    map1.Layers.Add(layer);
+                }
 
-                var layer = new WatershedLayer(e) { Name = "zones" };
-                map1.Layers.Add(layer);
+                layer.Edges = e;
             };
 
             if (InvokeRequired)
@@ -73,23 +77,23 @@ namespace Triangulation.Views
         public void OnBoundaryExtracted(Dictionary<int, ZoneInfo> zones)
         {
             Action<Dictionary<int, ZoneInfo>> action = z =>
-           {
-               map1.Layers["zones"].Enabled = false;
+            {
+                map1.Layers["zones"].Enabled = false;
 
-               BoundaryLayer layer;
-               if ((layer = (BoundaryLayer)map1.Layers["boundary"]) == null)
-               {
-                   layer = new BoundaryLayer { Name = "boundary" };
-                   map1.Layers.Add(layer);
-               }
+                BoundaryLayer layer;
+                if ((layer = (BoundaryLayer)map1.Layers["boundary"]) == null)
+                {
+                    layer = new BoundaryLayer { Name = "boundary" };
+                    map1.Layers.Add(layer);
+                }
 
-               layer.Zones = z;
-               listBox1.Items.Clear();
-               foreach (var key in z.Keys.OrderBy(i => i))
-               {
-                   listBox1.Items.Add(key);
-               }
-           };
+                layer.Zones = z;
+                listBox1.Items.Clear();
+                foreach (var key in z.Keys.OrderBy(i => i))
+                {
+                    listBox1.Items.Add(key);
+                }
+            };
 
             if (InvokeRequired)
                 Invoke(action, zones);
@@ -194,6 +198,52 @@ namespace Triangulation.Views
             statusLabel.Text = @"Код русла:" + BuildLabel(node);
         }
 
+        private void OnNodeUnion(object sender, EventArgs e)
+        {
+            var treeNode = treeView.SelectedNode;
+            var node = (Node)treeNode.Tag;
+
+            if (node == null) return;
+
+            if (!node.HasChildren) return;
+
+            var vertices = new List<Vertex>();
+            node.Traverse(x =>
+            {
+                vertices.AddRange(x.Vertices.Select((v, i) => new Vertex(v.X, v.Y, node.Label)));
+            });
+            node.Vertices = vertices;
+            node.ClearChildren();
+
+            treeNode.Collapse();
+            treeNode.Nodes.Clear();
+        }
+
+        private void OnNodeSelectAll(object sender, EventArgs e)
+        {
+            var treeNode = treeView.SelectedNode;
+            var node = (Node)treeNode.Tag;
+
+            if (node == null) return;
+
+            var layer = (GraphLayer)map1.Layers["graph"];
+            if (layer == null) return;
+
+            var vertices = new List<Vertex>();
+            node.Traverse(x =>
+            {
+                vertices.AddRange(x.Vertices);
+            });
+
+            layer.Selected = vertices;
+        }
+
+        private void OnNodeClick(object sender, TreeNodeMouseClickEventArgs e)
+        {
+            if (e.Button == MouseButtons.Right)
+                treeView.SelectedNode = e.Node;
+        }
+
         private void OnExit(object sender, EventArgs e)
         {
             Close();
@@ -211,7 +261,7 @@ namespace Triangulation.Views
                 BuildTree(child, item);
             }
 
-            treeView1.Nodes.Add(item);
+            treeView.Nodes.Add(item);
         }
 
         private void BuildTree(Node root, TreeNode node)
@@ -221,6 +271,9 @@ namespace Triangulation.Views
             {
                 BuildTree(child, item);
             }
+
+            if (item.Nodes.Count > 0) item.ContextMenuStrip = contextTreeMenu;
+
             node.Nodes.Add(item);
         }
 
