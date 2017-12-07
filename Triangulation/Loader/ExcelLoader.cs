@@ -26,8 +26,7 @@ namespace Triangulation.Loader
         public Node Load(string filename)
         {
             Preconditions.CheckNotNullOrEmpty(filename, "filename");
-
-            var id = 1; // id ерика
+            
             var index = 2; // страница, с которой парсим ерики
             var offset = 14;
             var counter = 0;
@@ -54,14 +53,13 @@ namespace Triangulation.Loader
                     var value = matrix[rect.Y, rect.X]?.ToString();
                     if (string.IsNullOrWhiteSpace(value)) break;
 
-                    value = matrix[rect.Y, rect.X + 4]?.ToString();
+                    var marker = value = matrix[rect.Y, rect.X + 4]?.ToString();
                     var node = root;
                     for (int i = 5; i < 9; i++)
                     {
                         if (node[value] == null)
                         {
                             node = node.AddChild(value);
-                            node.Label = id++;
                             break;
                         }
 
@@ -69,9 +67,13 @@ namespace Triangulation.Loader
                         value = matrix[rect.Y, rect.X + i]?.ToString();
 
                         if (value == "0") break;
+
+                        marker += value;
                     }
 
-                    var label = node.Label;
+                    if(!int.TryParse(marker, out var label)) break;
+
+                    node.Label = label;
                     for (int i = 0; i < rect.Height; i++)
                     {
                         if (matrix.GetLength(0) <= rect.Y + i) break;
