@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Triangulation.Collection;
 using Triangulation.Geometry;
 
 namespace Triangulation.MapReduce
@@ -12,7 +13,7 @@ namespace Triangulation.MapReduce
 
             var reduceResult = mapResult.GroupBy(
                 pair => pair.Key,
-                (key, values) => new KeyValuePair<Edge, IEnumerable<Triangle>>(key, values.Select(v => v.Value)));
+                (key, values) => new Pair<Edge, IEnumerable<Triangle>>(key, values.Select(v => v.Value)));
 
             var result = new Dictionary<Edge, IList<Triangle>>();
 
@@ -27,19 +28,19 @@ namespace Triangulation.MapReduce
             return result;
         }
 
-        public IEnumerable<KeyValuePair<Edge, Triangle>> Map(Triangle value)
+        public IEnumerable<Pair<Edge, Triangle>> Map(Triangle value)
         {
-            return new List<KeyValuePair<Edge, Triangle>>
+            return new List<Pair<Edge, Triangle>>
             {
-                new KeyValuePair<Edge, Triangle>(value.E0, value),
-                new KeyValuePair<Edge, Triangle>(value.E1, value),
-                new KeyValuePair<Edge, Triangle>(value.E2, value)
+                new Pair<Edge, Triangle>(value.E0, value),
+                new Pair<Edge, Triangle>(value.E1, value),
+                new Pair<Edge, Triangle>(value.E2, value)
             };
         }
 
-        public KeyValuePair<Edge, IList<Triangle>> Reduce(KeyValuePair<Edge, IEnumerable<Triangle>> value)
+        public Pair<Edge, IList<Triangle>> Reduce(Pair<Edge, IEnumerable<Triangle>> value)
         {
-            return new KeyValuePair<Edge, IList<Triangle>>(value.Key, value.Value.ToList());
+            return new Pair<Edge, IList<Triangle>>(value.Key, value.Value.ToList());
         }
     }
 }

@@ -36,9 +36,9 @@ namespace Triangulation.Zones
             root.Traverse(node =>
             {
                 var label = node.Label;
-
+                
                 if (!zones.ContainsKey(label)) return;
-
+                
                 node.Boundary = zones[label];
             });
         }
@@ -89,7 +89,7 @@ namespace Triangulation.Zones
             var y = start.Y;
             var dir = 7;
 
-            IList<Point> contour = new List<Point> { start };
+            List<Point> contour = new List<Point> { start };
 
             do
             {
@@ -110,7 +110,7 @@ namespace Triangulation.Zones
             } while (!(contour.Last() == contour.First()));
 
             contour.RemoveAt(0);
-            return contour.ToList();
+            return contour;
         }
 
         public static void FillZone(float[,] grd, Point start, int from, int to)

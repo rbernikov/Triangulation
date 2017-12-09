@@ -67,6 +67,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Collection\Pair.cs" />
     <Compile Include="Controllers\IMainController.cs" />
     <Compile Include="Controllers\MainControllerImpl.cs" />
     <Compile Include="Controls\Layers\BaseLayer.cs" />
@@ -85,6 +86,7 @@
     <Compile Include="MapReduce\CommonBoundary.cs" />
     <Compile Include="MapReduce\CommonTriangles.cs" />
     <Compile Include="Tree\Node.cs" />
+    <Compile Include="Union\UnionParams.cs" />
     <Compile Include="Utils\EnumerableEx.cs" />
     <Compile Include="Views\UnionForm.cs">
       <SubType>Form</SubType>

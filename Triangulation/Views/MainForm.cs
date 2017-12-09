@@ -41,7 +41,7 @@ namespace Triangulation.Views
             Action<Node, List<Vertex>> action = (x, y) =>
             {
                 var layer = new GraphLayer(y) { Name = "graph" };
-                map1.Layers.Add(layer);
+                map.Layers.Add(layer);
 
                 BuildTree(x);
             };
@@ -58,14 +58,14 @@ namespace Triangulation.Views
             {
                 saveZonesItem.Enabled = true;
 
-                var boundary = map1.Layers["boundary"];
+                var boundary = map.Layers["boundary"];
                 if (boundary != null) boundary.Enabled = false;
 
                 WatershedLayer layer;
-                if ((layer = (WatershedLayer)map1.Layers["zones"]) == null)
+                if ((layer = (WatershedLayer)map.Layers["zones"]) == null)
                 {
                     layer = new WatershedLayer { Name = "zones" };
-                    map1.Layers.Add(layer);
+                    map.Layers.Add(layer);
                 }
 
                 layer.Edges = e;
@@ -84,14 +84,14 @@ namespace Triangulation.Views
         {
             Action<Node> action = node =>
             {
-                var zones = map1.Layers["zones"];
+                var zones = map.Layers["zones"];
                 if (zones != null) zones.Enabled = false;
 
                 BoundaryLayer layer;
-                if ((layer = (BoundaryLayer)map1.Layers["boundary"]) == null)
+                if ((layer = (BoundaryLayer)map.Layers["boundary"]) == null)
                 {
                     layer = new BoundaryLayer { Name = "boundary" };
-                    map1.Layers.Add(layer);
+                    map.Layers.Add(layer);
                 }
 
                 layer.Root = node;
@@ -150,7 +150,7 @@ namespace Triangulation.Views
 
         private void OnOpenGraph(object sender, EventArgs e)
         {
-            var dialog = new OpenFileDialog { Filter = @"Excel file(*.xlsm)|*.xlsm" };
+            var dialog = new OpenFileDialog { Filter = @"Excel file(*.xlsx)|*.xlsx;*.xlsm" };
             if (dialog.ShowDialog(this) == DialogResult.OK)
                 _controller.OnLoad(dialog.FileName);
         }
@@ -188,7 +188,7 @@ namespace Triangulation.Views
         {
             if (listBox.SelectedIndex < 0) return;
 
-            var layer = (BoundaryLayer)map1.Layers["boundary"];
+            var layer = (BoundaryLayer)map.Layers["boundary"];
             layer.Selected = (int)listBox.SelectedItem;
         }
 
@@ -198,7 +198,7 @@ namespace Triangulation.Views
 
             if (node == null) return;
 
-            var layer = (GraphLayer)map1.Layers["graph"];
+            var layer = (GraphLayer)map.Layers["graph"];
             if (layer == null) return;
 
             layer.Selected = node.Vertices;
@@ -222,7 +222,6 @@ namespace Triangulation.Views
             node.Vertices = vertices;
             node.ClearChildren();
 
-            treeNode.Collapse();
             treeNode.Nodes.Clear();
         }
 
@@ -233,7 +232,7 @@ namespace Triangulation.Views
 
             if (node == null) return;
 
-            var layer = (GraphLayer)map1.Layers["graph"];
+            var layer = (GraphLayer)map.Layers["graph"];
             if (layer == null) return;
 
             var vertices = new List<Vertex>();
