@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Triangulation.Collection;
 using Triangulation.Geometry;
 using Triangulation.Views;
 using Triangulation.Grd;
@@ -219,16 +220,20 @@ namespace Triangulation.Controllers
 
                 var vertex = node.Vertices[0];
 
-                FillZone(_grd.Data, vertex, node.Label);
+                FillZone(vertex, node.Label);
             });
         }
 
-        private void FillZone(float[,] grd, Vertex vertex, int zone)
+        private void FillZone(Vertex vertex, int zone)
         {
             var x = (int)vertex.X;
             var y = (int)vertex.Y;
 
+            var grd = _grd.Data;
+
             if (grd[x, y] != 0) return;
+
+            if (_grd.MaxZ < zone) _grd.MaxZ = zone;
 
             var queue = new Queue<Vertex>();
             queue.Enqueue(vertex);
@@ -258,9 +263,9 @@ namespace Triangulation.Controllers
             }
         }
 
-        private class Comparer : IComparer<KeyValuePair<int, int>>
+        private class Comparer : IComparer<Pair<int, int>>
         {
-            public int Compare(KeyValuePair<int, int> x, KeyValuePair<int, int> y)
+            public int Compare(Pair<int, int> x, Pair<int, int> y)
             {
                 var key = x.Key - y.Key;
                 return key != 0 ? key : x.Value - y.Value;

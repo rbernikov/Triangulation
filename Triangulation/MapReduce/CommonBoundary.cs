@@ -1,25 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using Triangulation.Collection;
 using Triangulation.Tree;
-using Triangulation.Zones;
 
 namespace Triangulation.MapReduce
 {
     public class CommonBoundary
     {
-        public Dictionary<KeyValuePair<int, int>, IList<Point>> Execute(Node value)
+        public Dictionary<Pair<int, int>, IList<Point>> Execute(Node value)
         {
-            var mapResult = new List<KeyValuePair<Point, int>>();
+            var mapResult = new List<Pair<Point, int>>();
 
             value.Traverse(node => mapResult.AddRange(Map(node)));
 
             var reduceSource = mapResult.GroupBy(
                 pair => pair.Key,
-                (key, values) => new KeyValuePair<Point, IEnumerable<int>>(key, values.Select(v => v.Value)));
+                (key, values) => new Pair<Point, IEnumerable<int>>(key, values.Select(v => v.Value)));
 
-            var result = new Dictionary<KeyValuePair<int, int>, IList<Point>>();
+            var result = new Dictionary<Pair<int, int>, IList<Point>>();
 
             foreach (var reduce in reduceSource)
             {
@@ -33,18 +32,18 @@ namespace Triangulation.MapReduce
             return result;
         }
 
-        public IEnumerable<KeyValuePair<Point, int>> Map(Node value)
+        public IEnumerable<Pair<Point, int>> Map(Node value)
         {
             return from point in value.Boundary
-                   select new KeyValuePair<Point, int>(point, value.Label);
+                   select new Pair<Point, int>(point, value.Label);
         }
 
-        public KeyValuePair<KeyValuePair<int, int>, Point> Reduce(KeyValuePair<Point, IEnumerable<int>> value)
+        public Pair<Pair<int, int>, Point> Reduce(Pair<Point, IEnumerable<int>> value)
         {
             var list = value.Value.ToList();
 
-            var key = new KeyValuePair<int, int>(list[0], list[1]);
-            return new KeyValuePair<KeyValuePair<int, int>, Point>(key, value.Key);
+            var key = new Pair<int, int>(list[0], list[1]);
+            return new Pair<Pair<int, int>, Point>(key, value.Key);
         }
     }
 }

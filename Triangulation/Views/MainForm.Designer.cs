@@ -41,7 +41,7 @@
             this.extractWatershedItem = new System.Windows.Forms.ToolStripMenuItem();
             this.extractBoundaryItem = new System.Windows.Forms.ToolStripMenuItem();
             this.unionZoneItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.map1 = new Triangulation.Controls.Map();
+            this.map = new Triangulation.Controls.Map();
             this.listBox = new System.Windows.Forms.ListBox();
             this.label1 = new System.Windows.Forms.Label();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
@@ -153,13 +153,14 @@
             this.unionZoneItem.Text = "Объединение зон";
             this.unionZoneItem.Click += new System.EventHandler(this.OnZoneUnion);
             // 
-            // map1
+            // map
             // 
-            this.map1.Location = new System.Drawing.Point(12, 27);
-            this.map1.Name = "map1";
-            this.map1.Size = new System.Drawing.Size(700, 500);
-            this.map1.TabIndex = 1;
-            this.map1.Text = "map1";
+            this.map.Location = new System.Drawing.Point(12, 27);
+            this.map.MapSize = new System.Drawing.Size(944, 944);
+            this.map.Name = "map";
+            this.map.Size = new System.Drawing.Size(700, 500);
+            this.map.TabIndex = 1;
+            this.map.Text = "map1";
             // 
             // listBox
             // 
@@ -263,7 +264,7 @@
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.listBox);
-            this.Controls.Add(this.map1);
+            this.Controls.Add(this.map);
             this.Controls.Add(this.menuStrip1);
             this.Font = new System.Drawing.Font("Segoe UI", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
@@ -292,7 +293,7 @@
         private System.Windows.Forms.ToolStripMenuItem saveZonesItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripMenuItem openMapItem;
-        private Controls.Map map1;
+        private Controls.Map map;
         private System.Windows.Forms.ToolStripMenuItem extractBoundaryItem;
         private System.Windows.Forms.ListBox listBox;
         private System.Windows.Forms.ToolStripMenuItem unionZoneItem;

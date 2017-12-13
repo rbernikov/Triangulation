@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Drawing;
+using Triangulation.Collection;
 using Triangulation.Grd;
 
 namespace Triangulation.Union
@@ -13,12 +14,12 @@ namespace Triangulation.Union
         /// <param name="zones">Зоны и их общие точки</param>
         /// <param name="percent">Условие</param>
         /// <returns>Зоны, которые нужно объединить</returns>
-        public Dictionary<KeyValuePair<int, int>, IList<Point>> Union(GrdFile map, Dictionary<KeyValuePair<int, int>, IList<Point>> zones, float percent)
+        public Dictionary<Pair<int, int>, IList<Point>> Union(GrdFile map, Dictionary<Pair<int, int>, IList<Point>> zones, float percent)
         {
             Preconditions.CheckNotNull(map, "map");
             Preconditions.CheckNotNull(zones, "zones");
 
-            var union = new Dictionary<KeyValuePair<int, int>, IList<Point>>();
+            var union = new Dictionary<Pair<int, int>, IList<Point>>();
 
             foreach (var zone in zones)
             {
@@ -28,7 +29,7 @@ namespace Triangulation.Union
 
                 if (Condition(map, points, percent))
                 {
-                    union.Add(new KeyValuePair<int, int>(first, second), points);
+                    union.Add(new Pair<int, int>(first, second), points);
                 }
             }
 
