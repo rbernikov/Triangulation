@@ -135,24 +135,29 @@ namespace Triangulation.Controllers
                 return;
             }
 
+            var leafs = GetLeafs(_root);
             var mapReduce = new CommonBoundary();
-            var execute = mapReduce.Execute(_root);
 
-            var dictionary = union.Union(_map, execute, percent);
-            foreach (var zone in dictionary.OrderBy(x => x.Key, new Comparer()))
+            foreach (var leaf in leafs)
             {
-                var first = zone.Key.Key;
-                var second = zone.Key.Value;
-                var points = zone.Value;
+                var execute = mapReduce.Execute(leaf);
 
-                foreach (var point in zone.Value)
+                var dictionary = union.Union(_map, execute, percent);
+                foreach (var zone in dictionary.OrderBy(x => x.Key, new Comparer()))
                 {
-                    _grd.Data[point.X, point.Y] = second;
+                    var first = zone.Key.Key;
+                    var second = zone.Key.Value;
+                    var points = zone.Value;
+
+                    foreach (var point in zone.Value)
+                    {
+                        _grd.Data[point.X, point.Y] = second;
+                    }
+
+                    if (points.Count < 2) continue;
+
+                    Zone.FillZone(_grd.Data, points[1], second, first);
                 }
-
-                if (points.Count < 2) continue;
-
-                Zone.FillZone(_grd.Data, points[1], second, first);
             }
         }
 
@@ -183,6 +188,20 @@ namespace Triangulation.Controllers
         private void AddVertices(Node root)
         {
             _vertices.AddRange(root.Vertices);
+        }
+
+        private IEnumerable<Node> GetLeafs(Node root)
+        {
+            Preconditions.CheckNotNull(root, "root");
+
+            var nodes = new List<Node>();
+            root.Traverse(node =>
+            {
+                if (!node.HasChildren)
+                    nodes.Add(node.Parent);
+            });
+
+            return nodes;
         }
 
         private void FillZones(IEnumerable<Edge> edges)
